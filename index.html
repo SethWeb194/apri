@@ -34,14 +34,22 @@
   </section>
 </main>
 <script>
-// Link format: https://…/#<vault>/<note>
-// Everything after "#" stays on the device: browsers never send it to the server.
+// Link formats (everything after "#" stays on the device: browsers never send it to the server):
+//   short: https://…/#Giovanni_17.5            -> vault "Seth’s Obsidian", "_" = space
+//   long:  https://…/#<vault>/<note>            -> still supported for older links
+const DEFAULT_VAULT = "Seth’s Obsidian";
 const enc = s => encodeURIComponent(s).replace(/[!'()*]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
 const raw = location.hash.slice(1);
-const cut = raw.indexOf("/");
 let vault = "", note = "";
 try {
-  if (cut > 0) { vault = decodeURIComponent(raw.slice(0, cut)); note = decodeURIComponent(raw.slice(cut + 1)); }
+  const cut = raw.indexOf("/");
+  if (cut > 0) {
+    vault = decodeURIComponent(raw.slice(0, cut));
+    note = decodeURIComponent(raw.slice(cut + 1));
+  } else if (raw) {
+    vault = DEFAULT_VAULT;
+    note = decodeURIComponent(raw.replace(/_/g, " "));
+  }
 } catch (e) { vault = note = ""; }
 
 if (vault && note) {
